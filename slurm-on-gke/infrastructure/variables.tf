@@ -19,12 +19,13 @@ variable "billing_account_id" {
   type        = string
   nullable    = false
 }
-
+/*
 variable "folder_id" {
   description = "Google Cloud Folder ID"
   type        = string
   nullable    = false
 }
+*/
 
 variable "impersonate_service_account" {
   description = "Service account to be used while using Google Cloud APIs"
@@ -39,8 +40,17 @@ variable "region" {
   nullable    = false
 }
 
+
+/*
 variable "project_id" {
   description = "Google Cloud Project ID"
   type        = string
   nullable    = false
+  
 }
+
+
+data "google_project" "existing_project" {
+  project_id = "tiangel"
+}
+*/

@@ -32,7 +32,8 @@ module "slurm_nodepool_sa" {
 module "cluster-1-nodepool-2" {
   source       = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/gke-nodepool?ref=v33.0.0"
   project_id   = module.project.project_id
-  cluster_name = module.cluster-1.name
+  //cluster_name = module.cluster-1.name
+  cluster_name = "cluster-1"
   location     = var.region
   name         = "slurm-001"
   service_account = {
@@ -59,8 +60,15 @@ module "cluster-1-nodepool-2" {
         version = "DEFAULT"
       }
     }
-  }
 
+     enable_shielded_nodes = true
+     shielded_instance_config = {
+        enable_integrity_monitoring = true
+        enable_secure_boot          = true
+      }
+  }
+  
+  /*
   nodepool_config = {
     autoscaling = {
       max_node_count = 10
@@ -71,12 +79,16 @@ module "cluster-1-nodepool-2" {
       auto_upgrade = true
     }
   }
+  */
+
+  depends_on = [ module.cluster-1 ]
 }
 
 module "cluster-1-nodepool-3" {
   source       = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/gke-nodepool?ref=v33.0.0"
   project_id   = module.project.project_id
-  cluster_name = module.cluster-1.name
+  //cluster_name = module.cluster-1.name
+  cluster_name = "cluster-1"
   location     = var.region
   name         = "slurm-002"
   service_account = {
@@ -96,9 +108,14 @@ module "cluster-1-nodepool-3" {
     disk_type    = "pd-ssd"
     gvnic        = true
     spot         = false
-  }
 
-  nodepool_config = {
+    enable_shielded_nodes = true
+
+    shielded_instance_config = {
+        enable_integrity_monitoring = true
+        enable_secure_boot          = true
+      }
+
     autoscaling = {
       max_node_count = 10
       min_node_count = 2
@@ -108,4 +125,19 @@ module "cluster-1-nodepool-3" {
       auto_upgrade = true
     }
   }
+
+  /*
+  nodepool_config = {
+    autoscaling = {
+      max_node_count = 10
+      min_node_count = 2
+    }
+    management = {
+      auto_repair  = true
+      auto_upgrade = true
+    }
+
+  }*/
+
+  depends_on = [ module.cluster-1 ]
 }

@@ -14,11 +14,17 @@
  * limitations under the License.
  */
 
+
 module "project" {
   source          = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/project?ref=v33.0.0"
   billing_account = var.billing_account_id
-  name            = var.project_id
-  parent          = var.folder_id
+  //project_create = false
+  //name = data.google_project.existing_project.project_id
+  name = "tiangel"
+  
+
+  //name            = var.project_id
+  //parent          = var.folder_id
   services = [
     "compute.googleapis.com",
     "stackdriver.googleapis.com",
@@ -28,9 +34,11 @@ module "project" {
   ]
 }
 
+
 module "vpc" {
   source     = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/net-vpc?ref=v33.0.0"
   project_id = module.project.project_id
+  
   name       = "default"
   subnets = [
     {
@@ -62,6 +70,7 @@ module "vpc" {
 
 module "firewall" {
   source     = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/net-vpc-firewall?ref=v33.0.0"
+  
   project_id = module.project.project_id
   network    = module.vpc.network.name
   default_rules_config = {
@@ -80,6 +89,7 @@ module "firewall" {
 module "nat" {
   source         = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/net-cloudnat?ref=v33.0.0"
   project_id     = module.project.project_id
+  
   region         = var.region
   name           = "default"
   router_network = module.vpc.network.self_link
@@ -88,6 +98,7 @@ module "nat" {
 module "docker_artifact_registry" {
   source     = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/artifact-registry?ref=v33.0.0"
   project_id = module.project.project_id
+  
   location   = var.region
   name       = "slurm"
   format     = { docker = { standard = {} } }
@@ -96,6 +107,7 @@ module "docker_artifact_registry" {
 module "cluster_nodepool_sa" {
   source     = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/iam-service-account?ref=v33.0.0"
   project_id = module.project.project_id
+  
   name       = "cluster-nodepool-sa"
   iam_project_roles = {
     "${module.project.project_id}" = [
@@ -107,6 +119,84 @@ module "cluster_nodepool_sa" {
 }
 
 
+/*
+module "cluster-1" {
+  //source              = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/gke-cluster-standard?ref=v33.0.0"
+  source = "../../modules/gke-cluster-standard"
+  project_id          = module.project.project_id
+  
+  name                = "cluster-1"
+  location            = var.region
+  release_channel     = "RAPID"
+  deletion_protection = false
+  vpc_config = {
+    network    = module.vpc.self_link
+    subnetwork = module.vpc.subnets["${var.region}/subnet-1"].self_link
+    secondary_range_names = {
+      pods     = "pods"
+      services = "services"
+    }
+    master_ipv4_cidr_block = "172.19.27.0/28"
+    master_authorized_ranges = {
+      internal-vms = "10.0.0.0/8"
+    }
+  }
+  enable_addons = {
+    gce_persistent_disk_csi_driver = true
+    http_load_balancing            = true
+    horizontal_pod_autoscaling     = true
+    gcp_filestore_csi_driver       = true
+    gcs_fuse_csi_driver            = true
+  }
+
+  enable_features = {
+    dataplane_v2         = true
+    workload_identity    = true
+    image_streaming      = true
+    intranode_visibility = true
+
+    dns = {
+      provider = "CLOUD_DNS"
+      scope    = "CLUSTER_SCOPE"
+    }
+  }
+
+  backup_configs = {
+    enable_backup_agent = false
+  }
+  monitoring_config = {
+    enable_api_server_metrics         = true
+    enable_controller_manager_metrics = true
+    enable_scheduler_metrics          = true
+  }
+  logging_config = {
+    enable_workloads_logs = true
+  }
+  
+
+    
+  private_cluster_config = {
+    enable_private_endpoint = false
+    master_global_access    = true
+  }
+
+  access_config = {
+    # dns_access = true
+    ip_access = {
+      authorized_ranges = {
+        internal-vms = "10.0.0.0/16"
+      }
+      disable_public_endpoint = true
+      # private_endpoint_config = {
+      #   global_access = true
+      # }
+    }
+    private_nodes = true
+  }
+  
+}
+*/
+
 module "cluster-1" {
   source              = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/gke-cluster-standard?ref=v33.0.0"
   project_id          = module.project.project_id
@@ -114,6 +204,7 @@ module "cluster-1" {
   location            = var.region
   release_channel     = "RAPID"
   deletion_protection = false
+  //remove_default_node_pool = true
   vpc_config = {
     network    = module.vpc.self_link
     subnetwork = module.vpc.subnets["${var.region}/subnet-1"].self_link
@@ -139,12 +230,25 @@ module "cluster-1" {
     workload_identity    = true
     image_streaming      = true
     intranode_visibility = true
+    shielded_nodes = true
 
     dns = {
       provider = "CLOUD_DNS"
       scope    = "CLUSTER_SCOPE"
     }
   }
+
+  default_nodepool = {remove_pool=true}
+
+  /*
+  node_config = {
+    enable_shielded_nodes = true
+    shielded_instance_config = {
+        enable_integrity_monitoring = true
+        enable_secure_boot          = true
+      }
+  }
+  */
 
   backup_configs = {
     enable_backup_agent = false
@@ -159,10 +263,12 @@ module "cluster-1" {
   }
 }
 
+
 module "cluster-1-nodepool-1" {
   source       = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/gke-nodepool?ref=v33.0.0"
   project_id   = module.project.project_id
-  cluster_name = module.cluster-1.name
+  //cluster_name = module.cluster-1.name
+  cluster_name = "cluster-1"
   location     = var.region
   name         = "nodepool-1"
   service_account = {
@@ -181,8 +287,12 @@ module "cluster-1-nodepool-1" {
     disk_type           = "pd-ssd"
     ephemeral_ssd_count = 1
     gvnic               = true
-  }
-  nodepool_config = {
+    enable_shielded_nodes = true
+    shielded_instance_config = {
+        enable_integrity_monitoring = true
+        enable_secure_boot          = true
+      }
+
     autoscaling = {
       max_node_count = 10
       min_node_count = 2
@@ -192,5 +302,20 @@ module "cluster-1-nodepool-1" {
       auto_upgrade = true
     }
   }
+  
+  /*
+  nodepool_config = {
+    autoscaling = {
+      max_node_count = 10
+      min_node_count = 2
+    }
+    management = {
+      auto_repair  = true
+      auto_upgrade = true
+    }
+    */
+
+   
+  depends_on = [ module.cluster-1 ]
 }
 
