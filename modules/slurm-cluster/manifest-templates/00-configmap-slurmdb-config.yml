@@ -47,3 +47,4 @@ data:
     StorageType=accounting_storage/mysql
     StorageHost=${cluster_config.database.host}
     StorageUser=${cluster_config.database.user}
+    StoragePass=slurm-

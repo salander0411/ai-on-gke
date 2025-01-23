@@ -24,7 +24,9 @@ FROM ubuntu:22.04
 
 ARG SLURM_TAG=slurm-23.02
 ARG GOSU_VERSION=1.11
-
+ARG StorageHost=mysql
+ARG StorageUser=slurm
+ARG StoragePass=xxx
 
 RUN set -x \
     && apt-get update \
@@ -113,6 +115,8 @@ RUN mv /opt/prometheus-slurm-exporter/prometheus-slurm-exporter /usr/local/bin
 RUN mkdir -p /run/munge \
     && chown munge.munge /run/munge
 
+COPY  munge.key /tmp/munge.key
+COPY slurmdbd.conf /tmp/slurmdbd.conf
 VOLUME /etc/slurm
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod 755 /usr/local/bin/docker-entrypoint.sh

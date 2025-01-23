@@ -18,11 +18,10 @@
 module "project" {
   source          = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/project?ref=v33.0.0"
   billing_account = var.billing_account_id
-  //project_create = false
+  project_create = false
   //name = data.google_project.existing_project.project_id
   name = "tiangel"
   
-
   //name            = var.project_id
   //parent          = var.folder_id
   services = [
@@ -39,7 +38,7 @@ module "vpc" {
   source     = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/net-vpc?ref=v33.0.0"
   project_id = module.project.project_id
   
-  name       = "default"
+  name       = "slurm"
   subnets = [
     {
       ip_cidr_range = "10.0.0.0/24"
@@ -272,7 +271,7 @@ module "cluster-1-nodepool-1" {
   location     = var.region
   name         = "nodepool-1"
   service_account = {
-    create = false
+    create = falsecd 
     email  = module.cluster_nodepool_sa.email
     oauth_scopes = [
       "https://www.googleapis.com/auth/logging.write",
@@ -292,18 +291,9 @@ module "cluster-1-nodepool-1" {
         enable_integrity_monitoring = true
         enable_secure_boot          = true
       }
-
-    autoscaling = {
-      max_node_count = 10
-      min_node_count = 2
-    }
-    management = {
-      auto_repair  = true
-      auto_upgrade = true
-    }
   }
   
-  /*
+  
   nodepool_config = {
     autoscaling = {
       max_node_count = 10
@@ -313,7 +303,7 @@ module "cluster-1-nodepool-1" {
       auto_repair  = true
       auto_upgrade = true
     }
-    */
+  }
 
    
   depends_on = [ module.cluster-1 ]

@@ -26,7 +26,8 @@ metadata:
   name: slurm-shared-storage
   namespace: ${namespace}
 spec:
-  storageClassName: standard-rwx
+  #storageClassName: standard-rwx
+  storageClassName: filestore-slurmkub
   accessModes:
     - ReadWriteMany
   resources:

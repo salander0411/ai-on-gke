@@ -68,7 +68,7 @@ module "cluster-1-nodepool-2" {
       }
   }
   
-  /*
+  
   nodepool_config = {
     autoscaling = {
       max_node_count = 10
@@ -79,7 +79,7 @@ module "cluster-1-nodepool-2" {
       auto_upgrade = true
     }
   }
-  */
+  
 
   depends_on = [ module.cluster-1 ]
 }
@@ -126,7 +126,7 @@ module "cluster-1-nodepool-3" {
     }
   }
 
-  /*
+  
   nodepool_config = {
     autoscaling = {
       max_node_count = 10
@@ -137,7 +137,7 @@ module "cluster-1-nodepool-3" {
       auto_upgrade = true
     }
 
-  }*/
+  }
 
   depends_on = [ module.cluster-1 ]
 }

@@ -116,7 +116,7 @@ spec:
           hostPath:
             path: /run/dbus/system_bus_socket
         - name: slurm-jobdir
-          persistentVolumeClaim:
+          persistentVolume  bectl :
             claimName: slurm-shared-storage
         - name: munge-key-secret
           secret:

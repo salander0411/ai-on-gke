@@ -41,7 +41,7 @@ then
     echo "---> Starting the Slurm Database Daemon (slurmdbd) ..."
 
     cp /tmp/slurmdbd.conf /etc/slurm/slurmdbd.conf
-    echo "StoragePass=${StoragePass}" >> /etc/slurm/slurmdbd.conf
+    #echo "StoragePass=${StoragePass}" >> /etc/slurm/slurmdbd.conf
     chown slurm:slurm /etc/slurm/slurmdbd.conf
     chmod 600 /etc/slurm/slurmdbd.conf
     {
