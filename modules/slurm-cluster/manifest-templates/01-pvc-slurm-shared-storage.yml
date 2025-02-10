@@ -27,7 +27,7 @@ metadata:
   namespace: ${namespace}
 spec:
   #storageClassName: standard-rwx
-  storageClassName: filestore-slurmkub
+  storageClassName: filestore-slurm
   accessModes:
     - ReadWriteMany
   resources:

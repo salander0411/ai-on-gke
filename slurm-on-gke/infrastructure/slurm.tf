@@ -102,6 +102,9 @@ module "cluster-1-nodepool-3" {
     ]
   }
   node_locations = ["${var.region}-b"]
+  
+    
+    
   node_config = {
     machine_type = "g2-standard-4"
     disk_size_gb = 100
@@ -109,6 +112,7 @@ module "cluster-1-nodepool-3" {
     gvnic        = true
     spot         = false
 
+  
     enable_shielded_nodes = true
 
     shielded_instance_config = {

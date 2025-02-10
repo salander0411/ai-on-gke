@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-FROM ubuntu:22.04
+FROM nvidia/cuda:12.2.0-base-ubuntu22.04
 
 ARG SLURM_TAG=slurm-23.02
 ARG GOSU_VERSION=1.11
@@ -49,10 +49,6 @@ RUN set -x \
        psmisc \
        bzip2 \
        python3-http-parser \
-       nvidia-utils-535 \
-       nvidia-cuda-toolkit-gcc \
-       nvidia-cuda-dev \
-       libnvidia-compute-535 \
        mariadb-server \
        libdbus-1-dev \
        openmpi-common \

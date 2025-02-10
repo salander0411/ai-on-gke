@@ -94,7 +94,7 @@ module "nat" {
   router_network = module.vpc.network.self_link
 }
 
-module "docker_artifact_registry" {
+module "docker_artifact_rekubistry" {
   source     = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/artifact-registry?ref=v33.0.0"
   project_id = module.project.project_id
   
@@ -271,7 +271,7 @@ module "cluster-1-nodepool-1" {
   location     = var.region
   name         = "nodepool-1"
   service_account = {
-    create = falsecd 
+    create = false 
     email  = module.cluster_nodepool_sa.email
     oauth_scopes = [
       "https://www.googleapis.com/auth/logging.write",
